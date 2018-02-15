@@ -1,0 +1,22 @@
+---
+
+## General Jenkins Settings ##
+# jenkins_executor_count - The number of executors for the master 
+jenkins_executor_count: 5
+# jenkins_admin_password - The password of the admin account
+jenkins_admin_password: "password"
+# jenkins_api_token - The api token, if present this will be used instead of the admin user and password
+jenkins_api_token: ""
+# jenkins_protocol - The protocol to communicate with Jenkins
+jenkins_protocol: http
+# jenkins_hostname - The hostname of the jenkins server
+jenkins_hostname: 127.0.0.1
+# jenkins_port - The port to connect with jenkins on
+jenkins_port: 8080
+
+## Jenkins Plugins ##
+# A dictionary of jenkins plugins that should be present, or absent on the install
+# jenkins_plugins: 
+#   <pluging_name>:
+#     state: <present absent or latest> - either state or version is required
+#     version: <a version number of the pluging> - either state or version is required

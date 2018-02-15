@@ -1,0 +1,43 @@
+#!groovy
+
+import jenkins.*
+import hudson.*
+import jenkins.model.*
+import hudson.model.*
+import hudson.security.*
+
+// Functions //
+
+// Sets the executor count for the master
+def setExecutors(instance, executorCount) {
+    println "--> setting executor count to ${executorCount}"
+
+    instance.setNumExecutors(executorCount)
+    instance.save()
+}
+
+// Sets the admin password for the jenkins instance
+def setAdminPassword(instance, adminPassword) {
+    println "--> setting up jenkins admin user and password"
+
+    def realm = new HudsonPrivateSecurityRealm(false)
+    realm.createAccount("admin", adminPassword)
+    instance.setSecurityRealm(realm)
+    instance.save()
+}
+
+// Main() //
+// Global Variables//
+def executorCount = {{ jenkins_executor_count }}
+def adminPassword = "{{ jenkins_admin_password }}"
+
+println "--> starting jenkins configuration script"
+
+// get jenkins instance
+def instance = Jenkins.getInstance()
+
+// set executors
+setExecutors(instance, executorCount)
+
+// set admin password
+setAdminPassword(instance, adminPassword)

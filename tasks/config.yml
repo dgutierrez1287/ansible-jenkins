@@ -1,0 +1,60 @@
+---
+
+## Jenkins Config Tasks ##
+
+- name: Ensure Jenkins is started
+  service:
+    name: jenkins
+    state: started
+  register: jenkins_start
+
+- name: Wait for Jenkins To Start
+  uri: 
+    url: "{{ jenkins_protocol }}://{{ jenkins_hostname }}:{{ jenkins_port }}/login"
+    status_code: 200
+  register: jenkins_wait
+  until: jenkins_wait.status == 200
+  retries: 60
+  delay: 5
+  when: jenkins_start.changed
+
+- name: Check for jenkins Initial Admin Password 
+  stat: 
+    path: /var/lib/jenkins/secrets/initialAdminPassword
+  register: jenkins_initial_startup
+
+- name: Bypass - initialAdminPassword
+  shell: mv /var/lib/jenkins/secrets/initialAdminPassword /root/
+  when: jenkins_initial_startup.stat.exists == True
+
+- name: Copy Jenkins Init-Script
+  template:
+    src: init.groovy.j2
+    dest: /var/lib/jenkins/init.groovy
+    owner: jenkins
+    group: jenkins
+    mode: 0755
+  register: jenkins_init
+
+- name: Immediate Restart of Jenkins
+  service: 
+    name: jenkins
+    state: restarted
+  register: jenkins_restart_init
+  when: jenkins_init.changed
+
+- name: Wait for Jenkins After Init
+  uri: 
+    url: "{{ jenkins_protocol }}://{{ jenkins_hostname }}:{{ jenkins_port }}/login"
+    status_code: 200
+  register: jenkins_wait
+  until: jenkins_wait.status == 200
+  retries: 60
+  delay: 5
+  when: jenkins_restart_init.changed
+
+- name: Install all plugins
+  include: config/install_plugin.yml
+  static: no
+  with_dict: "{{ jenkins_plugins }}"
+  when: jenkins_plugins is defined

@@ -1,0 +1,32 @@
+---
+
+## Jenkins Plugin Install Tasks ##
+
+## Install Plugin using password ##
+# without version
+- Name: Install Plugin
+  jenkins_plugin:
+    name: "{{ item.key }}"
+    state: "{{ item.value.state }}"
+    params:
+      url_username: admin
+    url_password: "{{ jenkins_admin_password }}" 
+    url: "{{ jenkins_protocol }}://{{ jenkins_hostname }}:{{ jenkins_port }}"
+  notify: Restart Jenkins
+  when: jenkins_api_token == "" and 
+        item.value.version is not defined
+
+# with version 
+- Name: Install Plugin
+  jenkins_plugin:
+    name: "{{ item.key }}"
+    version: "{{ item.value.version }}"
+    params:
+      url_username: admin
+    url_password: "{{ jenkins_admin_password }}" 
+    url: "{{ jenkins_protocol }}://{{ jenkins_hostname }}:{{ jenkins_port }}"
+  notify: Restart Jenkins
+  when: jenkins_api_token == "" and 
+        item.value.version is defined
+
+## Other Plugin Installs for token and password remote installs ##

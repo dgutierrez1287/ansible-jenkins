@@ -1,0 +1,8 @@
+---
+
+## Jenkins Role Tasks ##
+- name: Install Jenkins
+  include: install.yml
+
+- name: Configure Jenkins
+  include: config.yml
