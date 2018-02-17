@@ -1,0 +1,81 @@
+---
+
+## Jenkins User Config Tasks ##
+- name: Add Jenkins User to correct groups 
+  user:
+    name: jenkins
+    groups: "{{ jenkins_groups }}"
+  
+- name: Get Jenkins ssh private key type fact
+  set_fact:
+    jenkins_ssh_private_key_type: "{{ jenkins_ssh_private_key | regex_replace('^(.*)://.*$', '\\1') }}"
+
+- name: Get Jenkins ssh private key data fact
+  set_fact:
+    jenkins_ssh_private_key_data: "{{ jenkins_ssh_private_key | regex_replace('^.*://(.*)$', '\\1') }}"
+
+- name: Get Jenkins ssh public key type fact
+  set_fact:
+    jenkins_ssh_public_key_type: "{{ jenkins_ssh_public_key | regex_replace('^(.*)://.*$', '\\1') }}"
+
+- name: Get Jenkins ssh publickey data fact
+  set_fact:
+    jenkins_ssh_public_key_data: "{{ jenkins_ssh_public_key | regex_replace('^.*://(.*)$', '\\1') }}"
+
+- name: Ensure Ssh Dir is created
+  file:
+    path: /var/lib/jenkins/.ssh
+    owner: jenkins
+    group: jenkins
+    state: directory
+    mode: 0755
+
+- name: Create Jenkins Private Key - File
+  copy:
+    src: "{{ jenkins_ssh_private_key_data }}"
+    dest: /var/lib/jenkins/.ssh/id_rsa
+    owner: jenkins
+    group: jenkins
+    mode: 0600
+  when: jenkins_ssh_private_key_type == "file"
+
+- name: Create Jenkins Private Key - PlainText
+  copy: 
+    content: "{{ jenkins_ssh_private_key_data }}"
+    dest: /var/lib/jenkins/.ssh/id_rsa
+    owner: jenkins
+    group: jenkins
+    mode: 0600
+  when: jenkins_ssh_private_key_type == "plaintext" and 
+        jenkins_ssh_private_key_data != "none"
+
+- name: Create Jenkins Public Key - File
+  copy: 
+    src: "{{ jenkins_ssh_public_key_data ]}"
+    dest: /var/lib/jenkins/.ssh/id_rsa.pub
+    owner: jenkins
+    group: jenkins
+    mode: 0644
+  when: jenkins_ssh_public_key_type == "file"
+
+- name: Create Jenkins Public Key - PlainText 
+  copy: 
+    content: "{{ jenkins_ssh_public_key_data }}"
+    dest: /var/lib/jenkins/.ssh/id_rsa
+    owner: jenkins
+    group: jenkins
+    mode: 0644
+  when: jenkins_ssh_public_key_type == "plaintext" and 
+        jenkins_ssh_public_key_data != "none"
+
+- name: Create Jenkins Authorized Keys File
+  template:
+    src: jenkins_authorized_keys.j2
+    dest: /var/lib/jenkins/.ssh/authorized_keys
+    owner: jenkins
+    group: jenkins
+    mode: 0644
+  when: jenkins_ssh_public_key_data != "none" and 
+        jenkins_authorized_keys > 0
+
+

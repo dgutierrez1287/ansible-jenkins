@@ -2,6 +2,9 @@
 
 ## Jenkins Config Tasks ##
 
+- name: Configure Jenkins User
+  include: config/jenkins-user-config.yml
+  
 - name: Ensure Jenkins is started
   service:
     name: jenkins
@@ -54,7 +57,7 @@
   when: jenkins_restart_init.changed
 
 - name: Install all plugins
-  include: config/install_plugin.yml
+  include: config/install-plugin.yml
   static: no
   with_dict: "{{ jenkins_plugins }}"
   when: jenkins_plugins is defined

@@ -20,3 +20,22 @@ jenkins_port: 8080
 #   <pluging_name>:
 #     state: <present absent or latest> - either state or version is required
 #     version: <a version number of the pluging> - either state or version is required
+
+## Jenkins User Config ##
+# jenkins_groups - The groups that the jenkins user should be added to
+jenkins_groups: 
+# jenkins_ssh_private_key - The private key for the jenkins user in the format <type>://<data> 
+# types allowed:
+#   - plaintext; the data would be the contents of the key
+#   - file; the data would be the path to the file that already exists on the system
+jenkins_ssh_private_key: plaintext://none
+# jenkins_ssh_public_key - The public key for the jenkins user in the format <type>://<data> 
+# types allowed:
+#   - plaintext; the data would be the contents of the key
+#   - file; the data would be the path to the file that already exists on the system
+jenkins_ssh_public_key: plaintext://none
+# jenkins_authorized_keys - A list of authorized public keys to add to the jenkins user (by default the jenkins user key is added to this list)
+jenkins_authorized_keys:
+
+
+
