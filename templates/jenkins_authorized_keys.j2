@@ -1,10 +1,12 @@
-{% if jenkins_ssh_public_key_type == "file" %} 
-    {{ lookup('file', jenkins_ssh_public_key_data) }}
-{% else %}
-    {% if jenkins_ssh_public_key_data != "none" %}
-        {{ jenkins_ssh_public_key_data }}
+{%- if jenkins_ssh_public_key_type == "file" -%} 
+    {{- lookup('file', jenkins_ssh_public_key_data) }}
+{%- else -%}
+    {%- if jenkins_ssh_public_key_data != "none" -%}
+        {{- jenkins_ssh_public_key_data }}
     {% endif %}
 {% endif %}
-{% for key in jenkins_authorized_keys %}
-    {{ key }}
-{% endfor %}
+{%- if jenkins_authorized_keys is iterable and jenkins_authorized_keys|length > 0 -%}
+    {%- for key in jenkins_authorized_keys -%}
+        {{- key }}
+    {% endfor %}
+{% endif %}

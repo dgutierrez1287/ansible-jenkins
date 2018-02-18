@@ -12,7 +12,7 @@
 
 - name: Get Jenkins ssh private key data fact
   set_fact:
-    jenkins_ssh_private_key_data: "{{ jenkins_ssh_private_key | regex_replace('^.*://(.*)$', '\\1') }}"
+    jenkins_ssh_private_key_data: "{{ jenkins_ssh_private_key | regex_replace('^.*://(-----BEGIN RSA PRIVATE KEY-----.*)$', '\\1') }}"
 
 - name: Get Jenkins ssh public key type fact
   set_fact:
@@ -61,7 +61,7 @@
 - name: Create Jenkins Public Key - PlainText 
   copy: 
     content: "{{ jenkins_ssh_public_key_data }}"
-    dest: /var/lib/jenkins/.ssh/id_rsa
+    dest: /var/lib/jenkins/.ssh/id_rsa.pub
     owner: jenkins
     group: jenkins
     mode: 0644
@@ -75,7 +75,7 @@
     owner: jenkins
     group: jenkins
     mode: 0644
-  when: jenkins_ssh_public_key_data != "none" and 
+  when: jenkins_ssh_public_key_data != "none" or 
         jenkins_authorized_keys > 0
 
 

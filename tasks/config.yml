@@ -39,7 +39,7 @@
     mode: 0755
   register: jenkins_init
 
-- name: Immediate Restart of Jenkins
+- name: Immediate Restart of Jenkins After Init Script
   service: 
     name: jenkins
     state: restarted
@@ -60,4 +60,28 @@
   include: config/install-plugin.yml
   static: no
   with_dict: "{{ jenkins_plugins }}"
+  register: jenkins_plugin_install
   when: jenkins_plugins is defined
+
+- name: Immediate Restart of Jenkins After Plugin Install
+  service: 
+    name: jenkins
+    state: restarted
+  register: jenkins_restart_init
+  when: jenkins_plugin_install.changed
+
+- name: Wait for Jenkins After Plugin Install
+  uri: 
+    url: "{{ jenkins_protocol }}://{{ jenkins_hostname }}:{{ jenkins_port }}/login"
+    status_code: 200
+  register: jenkins_wait
+  until: jenkins_wait.status == 200
+  retries: 60
+  delay: 5
+  when: jenkins_restart_init.changed
+
+- name: Set Jenkins Secrets
+  include: config/jenkins-secrets.yml
+  static: no
+  with_dict: "{{ jenkins_secrets }}"
+  when: jenkins_secrets is defined
