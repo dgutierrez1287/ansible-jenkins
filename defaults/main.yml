@@ -41,7 +41,7 @@ jenkins_authorized_keys:
 # A dictionary of jenkins secrets that should be present
 # jenkins_secrets:
 #   <secret_name>:
-#     secret_type: <ssh_key, user_password, secret_text, aws (Required)> - The type of secret
+#     secret_type: <ssh_key, user_password, secret_text, aws_credential (Required)> - The type of secret
 #     state: <present or absent (Required)> - if the secret should be there or not
 #     ssh_key_location: <path to ssh key (Required if secret_type is ssh_key)> - where the ssh key is located
 #     ssh_username: <username (Required if secret_type is ssh_key)> - the ssh user that the key belongs to
